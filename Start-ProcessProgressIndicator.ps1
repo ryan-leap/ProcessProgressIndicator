@@ -42,7 +42,7 @@ function Start-ProcessProgressIndicator {
         [string] $Status,
 
         [Parameter(Mandatory=$true)]
-        [string] $statusComplete,
+        [string] $StatusComplete,
 
         [Parameter(Mandatory=$true)]
         [string] $CurrentOperation,
