@@ -85,6 +85,6 @@ function Start-ProcessProgressIndicator {
 
     [string] $encodedCommand = [convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($hereBlock))
     $processArgs = @('-NoLogo','-NoProfile','-NonInteractive','-EncodedCommand',$encodedCommand)
-    Start-Process 'powershell.exe' -ArgumentList $processArgs -WindowStyle Maximized
+    Start-Process 'powershell.exe' -ArgumentList $processArgs -WindowStyle $WindowStyle
 
 }
