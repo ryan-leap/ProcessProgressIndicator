@@ -62,7 +62,7 @@ function Start-ProcessProgressIndicator {
     Try {
         `$Host.UI.RawUI.WindowTitle = "$WindowTitle"
         `$process = Get-Process -Id $Id -ErrorAction Stop
-        if ($null -eq `$process) {
+        if (`$null -eq `$process) {
           Throw "Process not found!"
         }
         do {
