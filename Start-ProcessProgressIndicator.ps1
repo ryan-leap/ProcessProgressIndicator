@@ -62,9 +62,6 @@ function Start-ProcessProgressIndicator {
     Try {
         `$Host.UI.RawUI.WindowTitle = "$WindowTitle"
         `$process = Get-Process -Id $Id -ErrorAction Stop
-        if (`$null -eq `$process) {
-          Throw "Process not found!"
-        }
         do {
             for (`$i = 1; `$i -le 100; `$i++) {
                 Write-Progress -Activity "$Activity" -Status "$Status" -CurrentOperation "$CurrentOperation" -PercentComplete `$i
