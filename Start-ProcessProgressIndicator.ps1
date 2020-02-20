@@ -52,21 +52,23 @@ function Start-ProcessProgressIndicator {
     
     switch -exact ($ProgressMeterSpeed) {
       'Slow'   { [int16] $progressDelay = 1000 }
-      'Medium' { [int16] $progressDelay = 500 }
-      'Fast'   { [int16] $progressDelay = 100 }
-      Default  { [int16] $progressDelay = 500}
+      'Medium' { [int16] $progressDelay =  500 }
+      'Fast'   { [int16] $progressDelay =  100 }
+      Default  { [int16] $progressDelay =  500}
     }
 
     $hereBlock = @"
     Try {
         `$Host.UI.RawUI.WindowTitle = "$Activity"
         `$process = Get-Process -Id $Id -ErrorAction Stop
+        `$stopwatch =  [system.diagnostics.stopwatch]::StartNew()
         do {
             for (`$i = 1; `$i -le 100; `$i++) {
-                Write-Progress -Activity "$Activity" -Status "$Status..." -CurrentOperation "$CurrentOperation..." -PercentComplete `$i
+                `$elapsed = "[`$(`$stopwatch.Elapsed.Hours):`$(`$stopwatch.Elapsed.Minutes):`$(`$stopwatch.Elapsed.Seconds)]"
+                Write-Progress -Activity "$Activity" -Status "$Status..." -CurrentOperation "`$elapsed $CurrentOperation..." -PercentComplete `$i
                 Start-Sleep -Milliseconds $progressDelay
                 if (`$process.HasExited) {
-                    Write-Progress -Activity "$Activity" -Status "$Status complete." -CurrentOperation "$CurrentOperation complete." -PercentComplete 100
+                    Write-Progress -Activity "$Activity" -Status "$Status complete." -CurrentOperation "`$elapsed $CurrentOperation complete." -PercentComplete 100
                     Start-Sleep -Seconds $SecondsToDisplayCompletionMessage
                     break
                 }
