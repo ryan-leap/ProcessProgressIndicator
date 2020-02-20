@@ -12,19 +12,14 @@ function Start-ProcessProgressIndicator {
 .PARAMETER Status
   Specifies the second line of text in the heading above the status bar. This text describes current state of
   the activity.
-.PARAMETER StatusComplete
-  Specifies the second line of text in the heading above the status bar. This text describes the state when
-  the activity has completed.
 .PARAMETER CurrentOperation
   Specifies the line of text below the progress bar. This text describes the operation that is currently taking
   place
-.PARAMETER CurrentOperationComplete
-  Specifies the line of text below the progress bar. This text describes the operation that has completed.
-.PARAMETER WindowTitle
-  Name to be displayed in the PowerShell Window Title
-.PARAMETER WindowStyle
-  Specifies the state of the window that is used for the new process. The acceptable values for this parameter
-  are: Normal, Hidden, Minimized, and Maximized. The default value is Maximized.
+.PARAMETER ProgressMeterSpeed
+  Controls the speed at which the progress bar increments
+.PARAMETER SecondsToDisplayCompletionMessage
+  When the process completes the message will briefly change indicating operation is complete.  This parameter
+  governs how long that message will be displayed.
 .EXAMPLE
 .NOTES
    Author: Ryan Leap
@@ -42,33 +37,37 @@ function Start-ProcessProgressIndicator {
         [string] $Status,
 
         [Parameter(Mandatory=$true)]
-        [string] $StatusComplete,
-
-        [Parameter(Mandatory=$true)]
         [string] $CurrentOperation,
-
-        [Parameter(Mandatory=$true)]
-        [string] $CurrentOperationComplete,
-
-        [Parameter(Mandatory=$true)]
-        [string] $WindowTitle,
 
         [ValidateSet('Normal', 'Hidden', 'Minimized', 'Maximized')]
         [Parameter(Mandatory=$false)]
-        [string] $WindowStyle = 'Maximized'
+        [string] $WindowStyle = 'Maximized',
+
+        [ValidateSet('Slow', 'Medium', 'Fast')]
+        [Parameter(Mandatory=$false)]
+        [string] $ProgressMeterSpeed = 'Medium',
+
+        [int16] $SecondsToDisplayCompletionMessage = 15
     )
     
+    switch -exact ($ProgressMeterSpeed) {
+      'Slow'   { [int16] $progressDelay = 1000 }
+      'Medium' { [int16] $progressDelay = 500 }
+      'Fast'   { [int16] $progressDelay = 100 }
+      Default  { [int16] $progressDelay = 500}
+    }
+
     $hereBlock = @"
     Try {
-        `$Host.UI.RawUI.WindowTitle = "$WindowTitle"
+        `$Host.UI.RawUI.WindowTitle = "$Activity"
         `$process = Get-Process -Id $Id -ErrorAction Stop
         do {
             for (`$i = 1; `$i -le 100; `$i++) {
-                Write-Progress -Activity "$Activity" -Status "$Status" -CurrentOperation "$CurrentOperation" -PercentComplete `$i
-                Start-Sleep -Milliseconds 200
+                Write-Progress -Activity "$Activity" -Status "$Status..." -CurrentOperation "$CurrentOperation..." -PercentComplete `$i
+                Start-Sleep -Milliseconds $progressDelay
                 if (`$process.HasExited) {
-                    Write-Progress -Activity "$Activity" -Status "$StatusComplete" -CurrentOperation "$CurrentOperationComplete" -PercentComplete 100
-                    Start-Sleep -Seconds 15
+                    Write-Progress -Activity "$Activity" -Status "$Status complete." -CurrentOperation "$CurrentOperation complete." -PercentComplete 100
+                    Start-Sleep -Seconds $SecondsToDisplayCompletionMessage
                     break
                 }
             }
@@ -76,7 +75,7 @@ function Start-ProcessProgressIndicator {
     }
     Catch {
       Write-Warning "Unable to track progress of process with ID [$Id]."
-      Start-Sleep -Seconds 10
+      Start-Sleep -Seconds $SecondsToDisplayCompletionMessage
     }
 "@
 
