@@ -54,10 +54,10 @@ function Start-ProcessProgressIndicator {
         do {
             for (`$i = 1; `$i -le 100; `$i++) {
                 `$elapsed = "{0,0:D2}:{1,0:D2}:{2,0:D2}" -f `$stopwatch.Elapsed.Hours,`$stopwatch.Elapsed.Minutes,`$stopwatch.Elapsed.Seconds
-                Write-Progress -Activity "Waiting for '`$(`$process.Name)' to complete..." -Status "Elapsed runtime (HH:MM:SS): `$elapsed" -CurrentOperation "$CurrentOperation..." -PercentComplete `$i
+                Write-Progress -Activity "Waiting for process '`$(`$process.Name)' to complete..." -Status "Elapsed runtime (HH:MM:SS): `$elapsed" -CurrentOperation "$CurrentOperation..." -PercentComplete `$i
                 Start-Sleep -Milliseconds $progressPace
                 if (`$process.HasExited) {
-                    Write-Progress -Activity "[`$(`$process.Name)] has completed." -Status "Elapsed runtime (HH:MM:SS): `$elapsed" -CurrentOperation "$CurrentOperation complete." -PercentComplete 100
+                    Write-Progress -Activity "Process '`$(`$process.Name)' complete!" -Status "Elapsed runtime (HH:MM:SS): `$elapsed" -CurrentOperation "$CurrentOperation complete!" -PercentComplete 100
                     Start-Sleep -Seconds $SecondsToDisplayCompletionMessage
                     break
                 }
