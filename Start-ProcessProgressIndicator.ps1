@@ -15,6 +15,7 @@ function Start-ProcessProgressIndicator {
   When the process completes the message will briefly change indicating operation is complete.  This parameter
   governs how long that message will be displayed.
 .EXAMPLE
+  Start-ProcessProgressIndicator -Id (Start-Process notepad -PassThru).Id -CurrentOperation "Using Notepad for a Demo"
 .NOTES
    Author: Ryan Leap
    Email: ryan.leap@gmail.com
