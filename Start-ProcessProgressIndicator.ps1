@@ -64,7 +64,7 @@ function Start-ProcessProgressIndicator {
         `$stopwatch =  [system.diagnostics.stopwatch]::StartNew()
         do {
             for (`$i = 1; `$i -le 100; `$i++) {
-                `$elapsed = "[`$(`$stopwatch.Elapsed.Hours):`$(`$stopwatch.Elapsed.Minutes):`$(`$stopwatch.Elapsed.Seconds)]"
+                `$elapsed = "{0,0:D2}:{1,0:D2}:{2,0:D2}" -f `$stopwatch.Elapsed.Hours,`$stopwatch.Elapsed.Minutes,`$stopwatch.Elapsed.Seconds
                 Write-Progress -Activity "$Activity" -Status "$Status..." -CurrentOperation "`$elapsed $CurrentOperation..." -PercentComplete `$i
                 Start-Sleep -Milliseconds $progressDelay
                 if (`$process.HasExited) {
