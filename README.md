@@ -17,7 +17,7 @@ Get-Help Start-ProcessProgressIndicator
 ```
 
 ## Examples
-### Opens a separate PowerShell window which will display a progress meter until the process is stopped
+### Opens a separate PowerShell window which will display a progress meter until the process (notepad in this case) is stopped
 ```powershell
 PS C:\> Start-ProcessProgressIndicator -Id (Start-Process notepad -PassThru).Id -CurrentOperation "Demo w/Notepad"
 ```
