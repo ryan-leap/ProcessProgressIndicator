@@ -17,7 +17,7 @@ Get-Help Start-ProcessProgressIndicator
 ```
 
 ## Examples
-### Produces a batch file which will output the day of the week
+### Opens a separate PowerShell window which will display a progress meter until the process is stopped
 ```powershell
 PS C:\> Start-ProcessProgressIndicator -Id (Start-Process notepad -PassThru).Id -CurrentOperation "Demo w/Notepad"
 ```
