@@ -6,12 +6,6 @@ function Start-ProcessProgressIndicator {
   Useful for creating a foreground process that shows a progress meter for a running process.
 .PARAMETER Id
   Specifies the process ID (PID) to monitor
-.PARAMETER Activity
-  Specifies the first line of text in the heading above the status bar. This text describes the activity whose
-  progress is being reported.
-.PARAMETER Status
-  Specifies the second line of text in the heading above the status bar. This text describes current state of
-  the activity.
 .PARAMETER CurrentOperation
   Specifies the line of text below the progress bar. This text describes the operation that is currently taking
   place
@@ -31,44 +25,39 @@ function Start-ProcessProgressIndicator {
         [int32] $Id,
 
         [Parameter(Mandatory=$true)]
-        [string] $Activity,
-
-        [Parameter(Mandatory=$true)]
-        [string] $Status,
-
-        [Parameter(Mandatory=$true)]
         [string] $CurrentOperation,
 
-        [ValidateSet('Normal', 'Hidden', 'Minimized', 'Maximized')]
+        [ValidateSet('Normal', 'Maximized')]
         [Parameter(Mandatory=$false)]
-        [string] $WindowStyle = 'Maximized',
+        [string] $WindowStyle = 'Normal',
 
-        [ValidateSet('Slow', 'Medium', 'Fast')]
+        [ValidateSet('Slow', 'Normal', 'Fast')]
         [Parameter(Mandatory=$false)]
-        [string] $ProgressMeterSpeed = 'Medium',
+        [string] $ProgressMeterSpeed = 'Normal',
 
-        [int16] $SecondsToDisplayCompletionMessage = 15
+        [Parameter(Mandatory=$false)]
+        [int16] $SecondsToDisplayCompletionMessage = 10
     )
     
     switch -exact ($ProgressMeterSpeed) {
-      'Slow'   { [int16] $progressDelay = 1000 }
-      'Medium' { [int16] $progressDelay =  500 }
-      'Fast'   { [int16] $progressDelay =  100 }
-      Default  { [int16] $progressDelay =  500}
+      'Slow'   { [int16] $progressPace = 1000 }
+      'Normal' { [int16] $progressPace =  500 }
+      'Fast'   { [int16] $progressPace =  100 }
+      Default  { [int16] $progressPace =  500}
     }
 
     $hereBlock = @"
     Try {
-        `$Host.UI.RawUI.WindowTitle = "$Activity"
         `$process = Get-Process -Id $Id -ErrorAction Stop
+        `$Host.UI.RawUI.WindowTitle = "Waiting for `$(`$process.Name)"
         `$stopwatch =  [system.diagnostics.stopwatch]::StartNew()
         do {
             for (`$i = 1; `$i -le 100; `$i++) {
                 `$elapsed = "{0,0:D2}:{1,0:D2}:{2,0:D2}" -f `$stopwatch.Elapsed.Hours,`$stopwatch.Elapsed.Minutes,`$stopwatch.Elapsed.Seconds
-                Write-Progress -Activity "$Activity" -Status "$Status..." -CurrentOperation "`$elapsed $CurrentOperation..." -PercentComplete `$i
-                Start-Sleep -Milliseconds $progressDelay
+                Write-Progress -Activity "Waiting for '`$(`$process.Name)' to complete..." -Status "Elapsed runtime (HH:MM:SS): `$elapsed" -CurrentOperation "$CurrentOperation..." -PercentComplete `$i
+                Start-Sleep -Milliseconds $progressPace
                 if (`$process.HasExited) {
-                    Write-Progress -Activity "$Activity" -Status "$Status complete." -CurrentOperation "`$elapsed $CurrentOperation complete." -PercentComplete 100
+                    Write-Progress -Activity "[`$(`$process.Name)] has completed." -Status "Elapsed runtime (HH:MM:SS): `$elapsed" -CurrentOperation "$CurrentOperation complete." -PercentComplete 100
                     Start-Sleep -Seconds $SecondsToDisplayCompletionMessage
                     break
                 }
