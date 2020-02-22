@@ -1,5 +1,5 @@
 # Process Progress Indicator
-Uses PowerShell Write-Progress cmdlet in a separate PowerShell Window as a progress indicator for a process.
+Uses PowerShell Write-Progress cmdlet in a separate PowerShell Window as a progress indicator for a process.  This can be used to offer a visual indicator of progress for a long running hidden process.
 
 ## Installing
 #### Download from GitHub repository
